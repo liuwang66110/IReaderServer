@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"models"
 	"github.com/gin-gonic/gin"
+	"controllers/user"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 
 func initRouter() *gin.Engine {
 	router := gin.Default()
+	router.POST("/v1/user/register", user.UserRegister)
 	return router
 }
 
