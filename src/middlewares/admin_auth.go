@@ -14,16 +14,16 @@ func AdminAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		utils.LogInstance().Println(c.Request.URL)
 		if c.PostForm("token") == "" {
-			c.JSON(http.StatusBadRequest, controllers.SetRsp(controllers.OK_INSERT_FAILED, nil))
+			c.JSON(http.StatusBadRequest, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "缺少参数:token", nil))
 			c.Abort()
 			return
 		}
-		var admin models.User
-		admin = models.User{
+		var user models.User
+		user = models.User{
 			Name: c.PostForm("token"),
 		}
 		db := models.Instance()
-		err := db.Where(models.User{Token: c.PostForm("token")}).First(&admin).Error
+		err := db.Where(models.User{Token: c.PostForm("token")}).First(&user).Error
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusForbidden, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "token错误", nil))
 			c.Abort()
@@ -33,20 +33,20 @@ func AdminAuth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		if !admin.ExpiredAt.After(time.Now()) {
+		if !user.ExpiredAt.After(time.Now()) {
 			c.JSON(http.StatusForbidden, controllers.SetRspMsg(controllers.OK_TOKEN_FAILED, "token过期", nil))
 			c.Abort()
 			return
 		}
-		utils.LogInstance().Println(admin)
+		utils.LogInstance().Println(user)
 		// TODO: token先不变更, 方便调试
 		// admin.Token = utils.RandMd5()
-		admin.ExpiredAt = time.Now().Add(models.USER_TOKEN_DURATION)
-		if err := db.Save(&admin).Error; err != nil {
+		user.ExpiredAt = time.Now().Add(models.USER_TOKEN_DURATION)
+		if err := db.Save(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_INSERT_FAILED, nil))
 		}
 		// c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_INSERT_SUCCESS, admin))
-		c.Set("admin", admin)
+		c.Set("user", user)
 		c.Next()
 	}
 }

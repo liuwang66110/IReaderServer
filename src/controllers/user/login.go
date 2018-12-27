@@ -29,15 +29,15 @@ func UserLogin(c *gin.Context) {
 	db := models.Instance()
 	err := db.Where(models.User{Name: c.PostForm("name")}).Not(models.User{Status: models.USER_ST_DELETED}).First(&user).Error
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusNotFound, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "用户名错误", nil))
+		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "用户名错误", nil))
 		return
 	} else if err != nil {
 		utils.LogInstance().Println(err.Error())
-		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_INSERT_FAILED, nil))
+		c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
 		return
 	}
 	if !utils.ChkPwd(user.Password, c.PostForm("password")) {
-		c.JSON(http.StatusForbidden, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "密码错误", nil))
+		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "密码错误", nil))
 		return
 	}
 	user.Token = utils.RandMd5()
@@ -45,7 +45,7 @@ func UserLogin(c *gin.Context) {
 	user.LastLoginAt = models.StdTime(time.Now())
 	if err := db.Save(&user).Error; err != nil {
 		utils.LogInstance().Println(err.Error())
-		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_INSERT_FAILED, nil))
+		c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
 		return
 	}
 	c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_INSERT_SUCCESS, user))

@@ -93,6 +93,7 @@ const (
 	OK_INSERT_FAILED = 1
 
 	OK_TOKEN_FAILED = 1001
+	OK_SERVER_ERROR = 1002
 )
 
 var mysqlErrorMapping = map[string]string{
@@ -102,5 +103,6 @@ var mysqlErrorMapping = map[string]string{
 var msgMapping = map[int][3]interface{}{
 	OK_INSERT_SUCCESS:              {"0", "请求成功", "0"},
 	OK_INSERT_FAILED:               {"1", "请求失败", "0"},
-	OK_TOKEN_FAILED:                {"2", "token错误", "0"},
+	OK_TOKEN_FAILED:                {"1001", "token错误", "0"},
+	OK_SERVER_ERROR:		{"1002", "服务器内部错误", "0"},
 }

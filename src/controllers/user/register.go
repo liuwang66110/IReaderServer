@@ -6,7 +6,6 @@ import (
 	"controllers"
 	"strings"
 	"time"
-	"strconv"
 	"models"
 	"utils"
 )
@@ -16,41 +15,49 @@ func UserRegister(c *gin.Context)  {
 
 	for _, v := range keys {
 		if c.PostForm(v) == "" {
-			c.JSON(http.StatusBadRequest, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "缺少参数:" + v,nil))
+			c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "缺少参数:" + v,nil))
 			return
 		}
 	}
 
-	var admin models.User
-	var mobile uint64
-	if (c.PostForm("mobile") != "") {
-		mobile, _ = strconv.ParseUint(c.PostForm("mobile"), 10, 64)
-	}
-
-	admin = models.User{
+	user := models.User{
 		Password:    utils.GenPwd(c.PostForm("password")),
 		Token:       utils.RandMd5(),
 		Name:        c.PostForm("name"),
-		Mobile:      mobile,
 		ExpiredAt:   time.Now().Add(models.USER_TOKEN_DURATION),
 		Status:      models.USER_ST_ENABLE,
-		CreatedAt:   time.Now(),
+		CreatedAt:   models.StdTime(time.Now()),
 		LastLoginAt: models.StdTime(time.Now()),
 	}
 	db := models.Instance()
-	// err := db.Where(models.CorpAdmin{Name: c.PostForm("name")}).FirstOrCreate(&admin).Error
-	err := db.Create(&admin).Error
+	tx := db.Begin()
+	err := tx.Create(&user).Error
 	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
 		c.JSON(controllers.Rsp(controllers.OK_INSERT_FAILED, nil, "用户名重复"))
-		// c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.ServerInternalDuplicateEntry, nil))
+		tx.Rollback()
 		return
 	}
 	if err != nil {
 		utils.LogInstance().Println(err.Error())
-		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_INSERT_FAILED, nil))
+		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
+		tx.Rollback()
 		return
 	}
 
-	c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_INSERT_SUCCESS, admin))
+	userInfo := models.UserInfo{
+		UserID: user.ID,
+		Name: utils.GetRandomString(12),
+	}
+	if err := tx.Create(&userInfo).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
+	var data map[string]interface{}
+	data = make(map[string]interface{})
+	data["name"] = userInfo.Name
+	data["token"] = user.Token
+	c.JSON(http.StatusOK, controllers.SetRsp(controllers.OK_INSERT_SUCCESS, data))
 	return
 }
