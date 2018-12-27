@@ -10,7 +10,6 @@ CREATE TABLE `user_main` (
     `last_login_at`  timestamp NOT NULL default '2000-01-01 00:00:00'  COMMENT '最后登录时间',
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_mobile` (`mobile`),
     UNIQUE KEY `uk_name` (`name`),
     UNIQUE KEY `uk_token` (`token`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
