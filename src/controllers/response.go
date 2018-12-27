@@ -91,7 +91,8 @@ func MysqlError(err error, custom string) string {
 const (
 	OK_INSERT_SUCCESS = 0
 	OK_INSERT_FAILED = 1
-	OK_TOKEN_FAILED = 2
+
+	OK_TOKEN_FAILED = 1001
 )
 
 var mysqlErrorMapping = map[string]string{

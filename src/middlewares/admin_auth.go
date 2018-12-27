@@ -25,7 +25,7 @@ func AdminAuth() gin.HandlerFunc {
 		db := models.Instance()
 		err := db.Where(models.User{Token: c.PostForm("token")}).First(&admin).Error
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusForbidden, controllers.SetRsp(controllers.OK_TOKEN_FAILED, nil))
+			c.JSON(http.StatusForbidden, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "token错误", nil))
 			c.Abort()
 			return
 		} else if err != nil {
@@ -34,7 +34,7 @@ func AdminAuth() gin.HandlerFunc {
 			return
 		}
 		if !admin.ExpiredAt.After(time.Now()) {
-			c.JSON(http.StatusForbidden, controllers.SetRsp(controllers.OK_TOKEN_FAILED, nil))
+			c.JSON(http.StatusForbidden, controllers.SetRspMsg(controllers.OK_TOKEN_FAILED, "token过期", nil))
 			c.Abort()
 			return
 		}
