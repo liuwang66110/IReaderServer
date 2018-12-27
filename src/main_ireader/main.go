@@ -20,6 +20,7 @@ func main() {
 func initRouter() *gin.Engine {
 	router := gin.Default()
 	router.POST("/v1/user/register", user.UserRegister)
+	router.POST("/v1/user/login", user.UserLogin)
 	return router
 }
 

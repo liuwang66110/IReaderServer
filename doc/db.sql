@@ -8,6 +8,7 @@ CREATE TABLE `user_main` (
     `token` varchar(40) not null default '' comment '访问token',
     `expired_at` timestamp not null default '2000-01-01 00:00:00' comment '登陆过期时间',
     `created_at` timestamp NOT NULL default '2000-01-01 00:00:00' COMMENT 'create time',
+    `last_login_at`  timestamp NOT NULL default '2000-01-01 00:00:00'  COMMENT '最后登录时间',
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_mobile` (`mobile`),
