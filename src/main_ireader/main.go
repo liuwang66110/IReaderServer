@@ -27,6 +27,7 @@ func initRouter() *gin.Engine {
 	router.POST("/v1/user/edit", middlewares.AdminAuth(), user.UserEdit)
 
 	router.POST("/v1/friend/list", middlewares.AdminAuth(), friend.FriendList)
+	router.POST("/v1/friend/add", middlewares.AdminAuth(), friend.FriendAdd)
 	return router
 }
 

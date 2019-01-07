@@ -35,6 +35,6 @@ create table `user_friend` (
     `content` varchar(255) not null default '' comment '内容',
     `confirm_at` timestamp NOT NULL default '2000-01-01 00:00:00'  COMMENT 'confirm time',
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    PRIMARY KEY (`id`)
-    UNIQUE KEY `uk_fid` (`user_id`, `friend_id`),
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_fid` (`user_id`, `friend_id`)
 )ENGINE=InnoDB AUTO_INCREMENT=1000000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
