@@ -10,7 +10,6 @@ CREATE TABLE `user_main` (
     `last_login_at`  timestamp NOT NULL default '2000-01-01 00:00:00'  COMMENT '最后登录时间',
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_name` (`name`),
     UNIQUE KEY `uk_token` (`token`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1000000 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -32,7 +31,7 @@ create table `user_friend` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
     `user_id` bigint(20) unsigned not null default 0 comment 'user_main.id',
     `friend_id` bigint(20) unsigned not null default 0 comment 'user_main.id',
-    `status` tinyint(3) unsigned NOT NULL DEFAULT '1' comment '好友状态标识。1-已申请，2-已拒绝，3-好友',
+    `status` tinyint(3) unsigned NOT NULL DEFAULT '1' comment '好友状态标识。1-已申请，2-已拒绝，3-好友, 4-删除',
     `content` varchar(255) not null default '' comment '内容',
     `confirm_at` timestamp NOT NULL default '2000-01-01 00:00:00'  COMMENT 'confirm time',
     `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',

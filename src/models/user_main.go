@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	ID          uint64    `gorm:"primary_key;AUTO_INCREMENT"`
-	Name        string    `gorm:"type:varchar(64);not null;default:'';unique_index:uk_name"`
+	Name        string    `gorm:"type:varchar(64);not null;default:'';"`
 	Password    string    `gorm:"type:varchar(60); not null; default:''" json:"-"`
 	Status      int       `gorm:"not null; default : 1" json:"-"`
 	Token       string    `gorm:"type:varchar(40);not null; default:'' ; unique_index:token" json:",omitempty"`

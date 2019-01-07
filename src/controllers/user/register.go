@@ -4,10 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"controllers"
-	"strings"
 	"time"
 	"models"
 	"utils"
+	"github.com/jinzhu/gorm"
+	"fmt"
 )
 
 func UserRegister(c *gin.Context)  {
@@ -30,14 +31,27 @@ func UserRegister(c *gin.Context)  {
 		LastLoginAt: models.StdTime(time.Now()),
 	}
 	db := models.Instance()
-	tx := db.Begin()
-	err := tx.Create(&user).Error
-	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
-		c.JSON(controllers.Rsp(controllers.OK_INSERT_FAILED, nil, "用户名重复"))
-		tx.Rollback()
+	var selectUser models.User
+	if err := db.Model(models.User{}).Where(models.User{Name: c.PostForm("name")}).Last(&selectUser).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			insertUser(c, db, user)
+			return
+		}
+		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
 		return
 	}
-	if err != nil {
+	fmt.Println(selectUser)
+	if selectUser.Status == models.USER_ST_DISABLE || selectUser.Status == models.USER_ST_DELETED {
+		insertUser(c, db, user)
+		return
+	}
+	c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "用户已存在", nil))
+	return
+}
+
+func insertUser(c *gin.Context, db *gorm.DB, user models.User)  {
+	tx := db.Begin()
+	if err := tx.Create(&user).Error; err != nil {
 		utils.LogInstance().Println(err.Error())
 		c.JSON(http.StatusInternalServerError, controllers.SetRsp(controllers.OK_SERVER_ERROR, nil))
 		tx.Rollback()

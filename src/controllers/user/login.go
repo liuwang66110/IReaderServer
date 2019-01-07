@@ -27,7 +27,7 @@ func UserLogin(c *gin.Context) {
 		Name: c.PostForm("name"),
 	}
 	db := models.Instance()
-	err := db.Where(models.User{Name: c.PostForm("name")}).Not(models.User{Status: models.USER_ST_DELETED}).First(&user).Error
+	err := db.Where(models.User{Name: c.PostForm("name"), Status: models.USER_ST_ENABLE}).First(&user).Error
 	if err == gorm.ErrRecordNotFound {
 		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "用户名错误", nil))
 		return

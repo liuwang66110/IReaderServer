@@ -9,14 +9,9 @@ import (
 )
 
 func FriendList(c *gin.Context) {
-	_, ok := c.Get("user")
+	tmp, ok := c.Get("user")
 	if !ok {
 		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "请先登陆", nil))
-		return
-	}
-
-	if (c.PostForm("user_id") == "") {
-		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "缺少参数:user_id", nil))
 		return
 	}
 
@@ -27,14 +22,11 @@ func FriendList(c *gin.Context) {
 		return
 	}
 
-	userID, idError := strconv.ParseUint(c.PostForm("user_id"), 10, 64)
-	if (idError != nil) {
-		c.JSON(http.StatusOK, controllers.SetRspMsg(controllers.OK_INSERT_FAILED, "id错误 ", nil))
-		return
-	}
+	user := tmp.(models.User)
+
 	db := models.Instance()
 	var count int
-	db = db.Model(models.UserFriend{}).Where(models.UserFriend{UserID: userID, Status: models.FRIEND_ST_AGREE}).Count(&count)
+	db = db.Model(models.UserFriend{}).Where(models.UserFriend{UserID: user.ID, Status: models.FRIEND_ST_AGREE}).Count(&count)
 
 	if page > -1 {
 		db = db.Offset(page * page_size).Limit(page_size)
